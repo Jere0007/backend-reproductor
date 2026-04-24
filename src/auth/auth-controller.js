@@ -20,7 +20,7 @@ export const login = async (req, res) => {
         if (!user) {
             return res.status(400).json({
                 success: false,
-                msg: "El email o username no existen en la base de datos"
+                msg: "El email o username incorrecto"
             });
         }
 
@@ -54,11 +54,10 @@ export const login = async (req, res) => {
 export const register = async (req, res) => {
   try {
     const data = req.body;
-
-    // Encriptar contraseña
+    // 3. Encriptar contraseña (solo si los datos anteriores son válidos)
     const encryptedPassword = await hash(data.password);
 
-    // Crear usuario
+    // 4. Crear usuario
     const user = await User.create({
       profilePhoto: data.profilePhoto,
       name: data.name,
@@ -71,17 +70,19 @@ export const register = async (req, res) => {
     });
 
     return res.status(201).json({
+      success: true,
       message: "Usuario registrado exitosamente",
       userDetails: {
+        // Mantenemos tu estructura de respuesta original
         user: [user.username, user.email, user.role],
       },
     });
   } catch (error) {
     console.log(error);
     return res.status(500).json({
+      success: false,
       message: "Error en el registro de usuario",
       error: error.message,
     });
   }
 };
-
